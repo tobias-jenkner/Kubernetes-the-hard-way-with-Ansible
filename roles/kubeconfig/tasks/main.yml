@@ -8,7 +8,7 @@
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
-      --server=https://{{ groups['loadbalancer'][0] }}:6443
+      --server=https://{{ groups['loadbalancers'][0] }}:6443
 
     kubectl config set-credentials admin \
       --client-certificate={{ PKI_DIR }}/admin.pem \
@@ -25,7 +25,7 @@
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
-      --server=https://{{ groups['loadbalancer'][0] }}:6443 \
+      --server=https://{{ groups['loadbalancers'][0] }}:6443 \
       --kubeconfig={{ CONF_DIR }}/{{ item }}.kubeconfig
    
     kubectl config set-credentials system:node:{{ item }} \
@@ -52,7 +52,7 @@
     kubectl config set-cluster k8s-the-hard-way \
        --certificate-authority={{ PKI_DIR }}/ca.pem \
        --embed-certs=true \
-       --server=https://{{ groups['loadbalancer'][0] }}:6443 \
+       --server=https://{{ groups['loadbalancers'][0] }}:6443 \
        --kubeconfig={{ CONF_DIR }}/kube-proxy.kubeconfig
 
     kubectl config set-credentials kube-proxy \
@@ -69,3 +69,73 @@
     kubectl config use-context default --kubeconfig={{ CONF_DIR }}/kube-proxy.kubeconfig
   args:
     creates: '{{ CONF_DIR }}/kube-proxy.kubeconfig'
+
+- name: Generate a kubeconfig file for the kube-controller-manager service
+  shell: |
+    kubectl config set-cluster kubernetes-the-hard-way \
+      --certificate-authority={{ PKI_DIR }}/ca.pem \
+      --embed-certs=true \
+      --server=https://127.0.0.1:6443 \
+      --kubeconfig={{ CONF_DIR }}/kube-controller-manager.kubeconfig
+
+    kubectl config set-credentials system:kube-controller-manager \
+      --client-certificate={{ PKI_DIR }}/kube-controller-manager.pem \
+      --client-key={{ PKI_DIR }}/kube-controller-manager-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ CONF_DIR }}/kube-controller-manager.kubeconfig
+
+    kubectl config set-context default \
+      --cluster=k8s-the-hard-way \
+      --user=system:kube-controller-manager \
+      --kubeconfig={{ CONF_DIR }}/kube-controller-manager.kubeconfig
+
+    kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+  args:
+    creates: '{{ CONF_DIR }}/kube-controller-manager.kubeconfig'
+
+- name: Generate a kubeconfig file for the kube-scheduler service
+  shell: |
+    kubectl config set-cluster k8s-the-hard-way \
+      --certificate-authority={{ PKI_DIR }}/ca.pem \
+      --embed-certs=true \
+      --server=https://127.0.0.1:6443 \
+      --kubeconfig={{ CONF_DIR }}/kube-scheduler.kubeconfig
+
+    kubectl config set-credentials system:kube-scheduler \
+      --client-certificate={{ PKI_DIR }}/kube-scheduler.pem \
+      --client-key={{ PKI_DIR }}/kube-scheduler-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ CONF_DIR }}/kube-scheduler.kubeconfig
+
+    kubectl config set-context default \
+      --cluster=k8s-the-hard-way \
+      --user=system:kube-scheduler \
+      --kubeconfig={{ CONF_DIR }}/kube-scheduler.kubeconfig
+
+    kubectl config use-context default --kubeconfig={{ CONF_DIR }}/kube-scheduler.kubeconfig
+  args:
+    creates: '{{ CONF_DIR }}/kube-scheduler.kubeconfig'
+
+- name: Generate a kubeconfig file for the admin user
+  shell: |
+    kubectl config set-cluster k8s-the-hard-way \
+      --certificate-authority={{ PKI_DIR }}/ca.pem \
+      --embed-certs=true \
+      --server=https://127.0.0.1:6443 \
+      --kubeconfig={{ CONF_DIR }}/admin.kubeconfig
+
+    kubectl config set-credentials admin \
+      --client-certificate={{ PKI_DIR }}/admin.pem \
+      --client-key={{ PKI_DIR }}/admin-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ CONF_DIR }}/admin.kubeconfig
+
+    kubectl config set-context default \
+      --cluster=k8s-the-hard-way \
+      --user=admin \
+      --kubeconfig={{ CONF_DIR }}/admin.kubeconfig
+
+    kubectl config use-context default --kubeconfig={{ CONF_DIR }}/admin.kubeconfig
+  args:
+    creates: '{{ CONF_DIR }}/admin.kubeconfig'
+
