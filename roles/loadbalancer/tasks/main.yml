@@ -1,9 +1,3 @@
-- name: Install nginx
-  apt:
-    name: nginx
-    state: latest
-    update_cache: yes
-
 - name: Configure nginx
   blockinfile:
     path: /etc/nginx/nginx.conf

@@ -7,13 +7,14 @@
   get_url:
     url: "{{ item.url }}"
     dest: "{{ item.dest }}"
-    mode: 0664
+    mode: 0764
   with_items:
     - { url: "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version }}/bin/linux/amd64/kube-apiserver", dest: "{{ BIN_DIR }}/kube-apiserver" }
     - { url: "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version }}/bin/linux/amd64/kube-controller-manager", dest: "{{ BIN_DIR }}/kube-controller-manager" }
     - { url: "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version }}/bin/linux/amd64/kube-scheduler", dest: "{{ BIN_DIR }}/kube-scheduler" }
     - { url: "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version }}/bin/linux/amd64/kubelet", dest: "{{ BIN_DIR }}/kubelet" }
     - { url: "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version }}/bin/linux/amd64/kube-proxy", dest: "{{ BIN_DIR }}/kube-proxy" }
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/{{ k8s_version }}/bin/linux/amd64/kubectl", dest: "{{ BIN_DIR }}/kubectl" }
 
 - name: Download Flannel
   get_url:

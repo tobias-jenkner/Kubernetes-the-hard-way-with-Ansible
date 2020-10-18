@@ -1,29 +1,29 @@
 - name: Add workers IPs to /etc/hosts
-  blockinfile:
+  lineinfile:
     path: /etc/hosts
-    block: |
-      10.0.0.110    k8s-worker1
-      10.0.0.111    k8s-worker2
-      10.0.0.112    k8s-worker3
+    regexp: "^.*{{ item }}$"
+    line: "{{ hostvars[item]['ansible_host'] }}    {{ item }}"
+  with_items: "{{ groups['k8s-workers'] }}"
 
 - name: Copy binaries
   copy:
     src: "{{ item }}"
     dest: /usr/local/bin/
     owner: root
-    group: root
+    group: k8s
     mode: 0554
   loop:
     - '{{ BIN_DIR }}/kube-apiserver'
     - '{{ BIN_DIR }}/kube-controller-manager'
     - '{{ BIN_DIR }}/kube-scheduler'
+    - '{{ BIN_DIR }}/kubectl'
 
 - name: Create config directory
   file:
     path: /var/lib/kubernetes
     state: directory
     owner: root
-    group: root
+    group: k8s
     mode: 0755
 
 - name: Copy certificates and keys
@@ -31,7 +31,7 @@
     src: "{{ item }}"
     dest: /var/lib/kubernetes/
     owner: root
-    group: root
+    group: k8s
     mode: 0644
   loop:
     - '{{ PKI_DIR }}/ca.pem'
@@ -45,7 +45,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: root
-    group: root
+    group: k8s
     mode: 0644
   with_items: 
     - { src: "lib/systemd/system/kube-apiserver.service.j2"          , dest: "/lib/systemd/system/kube-apiserver.service" }
@@ -58,12 +58,19 @@
 
 - meta: flush_handlers
 
-- name: Configure RBAC for kubelet authorization
-  run_once: yes
-  local_action: shell kubectl apply -f roles/k8s-master/templates/rbac-conf/rbac.yml
-  become_user: "{{ lookup('env','USER') }}"
-  register: rbac_conf
-  until: rbac_conf.stderr == ''
-  retries: 3
-  delay: 10
+  #- name: Copy rbac config file
+  #  template:
+  #    src: rbac-conf/rbac.yml
+  #    dest: "~/"
+
+    #- name: Configure RBAC for kubelet authorization
+    #  run_once: yes
+    #  #local_action: "shell kubectl apply -f roles/k8s-master/templates/rbac-conf/rbac.yml --kubeconfig {{ CONF_DIR }}/admin.kubeconfig"
+    #  shell: |
+    #    kubectl apply -f ~/rbac.yml --kubeconfig ~/admin.kubeconfig
+    #  #become_user: "{{ lookup('env','USER') }}"
+    #  register: rbac_conf
+    #  until: rbac_conf.stderr == ''
+    #  retries: 3
+    #  delay: 10
  

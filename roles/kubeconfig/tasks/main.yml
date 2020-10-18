@@ -5,6 +5,8 @@
 
 - name: Generate kubeconfig file for Admin
   shell: |
+    export PATH={{ BIN_DIR }}:$PATH
+
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
@@ -22,6 +24,7 @@
 
 - name: Configure kubeconf files for Kubelet
   shell: |
+    export PATH={{ BIN_DIR }}:$PATH
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
@@ -49,6 +52,8 @@
 
 - name: Generate kubeconf files for Kube-Proxy
   shell: |
+    export PATH={{ BIN_DIR }}:$PATH
+
     kubectl config set-cluster k8s-the-hard-way \
        --certificate-authority={{ PKI_DIR }}/ca.pem \
        --embed-certs=true \
@@ -72,6 +77,8 @@
 
 - name: Generate a kubeconfig file for the kube-controller-manager service
   shell: |
+    export PATH={{ BIN_DIR }}:$PATH
+
     kubectl config set-cluster kubernetes-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
@@ -89,12 +96,14 @@
       --user=system:kube-controller-manager \
       --kubeconfig={{ CONF_DIR }}/kube-controller-manager.kubeconfig
 
-    kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+      #kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
   args:
     creates: '{{ CONF_DIR }}/kube-controller-manager.kubeconfig'
 
 - name: Generate a kubeconfig file for the kube-scheduler service
   shell: |
+    export PATH={{ BIN_DIR }}:$PATH
+
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
@@ -118,6 +127,8 @@
 
 - name: Generate a kubeconfig file for the admin user
   shell: |
+    export PATH={{ BIN_DIR }}:$PATH
+
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \

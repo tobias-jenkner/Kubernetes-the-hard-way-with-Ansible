@@ -6,6 +6,14 @@
     group: root
     mode: 0755
 
+- name: Copy etcdctl binaries
+  copy:
+    src: '{{ BIN_DIR }}/etcdctl'
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Create config directory
   file:
     path: /etc/etcd
@@ -29,7 +37,7 @@
     state: directory
     owner: etcd
     group: etcd
-    mode: 0755
+    mode: 0700
 
 - name: Copy certificates and keys    
   copy:
