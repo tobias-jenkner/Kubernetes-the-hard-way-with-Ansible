@@ -32,13 +32,15 @@
     dest: /var/lib/kubernetes/
     owner: root
     group: k8s
-    mode: 0644
+    mode: 0640
   loop:
     - '{{ PKI_DIR }}/ca.pem'
     - '{{ PKI_DIR }}/ca-key.pem'
     - '{{ PKI_DIR }}/k8s-master.pem'
     - '{{ PKI_DIR }}/k8s-master-key.pem'
     - '{{ PKI_DIR }}/encryption-config.yml'
+    - '{{ PKI_DIR }}/service-account.pem'
+    - '{{ PKI_DIR }}/service-account-key.pem'
 
 - name: Copy systemd unit file
   template:
