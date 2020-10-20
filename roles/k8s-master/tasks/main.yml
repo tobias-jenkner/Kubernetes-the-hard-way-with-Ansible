@@ -11,7 +11,7 @@
     dest: /usr/local/bin/
     owner: root
     group: k8s
-    mode: 0554
+    mode: 0555
   loop:
     - '{{ BIN_DIR }}/kube-apiserver'
     - '{{ BIN_DIR }}/kube-controller-manager'

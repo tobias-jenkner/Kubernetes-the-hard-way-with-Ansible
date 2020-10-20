@@ -47,3 +47,56 @@
       - README.md  
       - READMEv2-etcdctl.md
     extra_opts: "--strip-components=1"
+
+- name: Download cri-tools
+  get_url:
+    url: 'https://github.com/kubernetes-sigs/cri-tools/releases/download/{{ cri_tools_version }}/crictl-{{ cri_tools_version }}-linux-amd64.tar.gz'
+    dest: '{{ BIN_DIR }}/crictl-{{ cri_tools_version }}-linux-amd64.tar.gz'
+    mode: 0644
+    
+- name: Extract cri-tools archive
+  unarchive:
+    src: '{{ BIN_DIR }}/crictl-{{ cri_tools_version }}-linux-amd64.tar.gz'
+    dest: "{{ BIN_DIR }}"
+    mode: 0554
+
+- name: Download runc
+  get_url:
+    url: 'https://github.com/opencontainers/runc/releases/download/{{ runc_version }}/runc.amd64'
+    dest: '{{ BIN_DIR }}/runc'
+    mode: 0644
+    
+- name: Download cni
+  get_url:
+    url: 'https://github.com/containernetworking/plugins/releases/download/{{ cni_version }}/cni-plugins-linux-amd64-{{ cni_version }}.tgz'
+    dest: '{{ BIN_DIR }}/cni-plugins-linux-amd64-{{ cni_version }}.tgz'
+    mode: 0644
+
+- name: Create cni directory
+  file:
+    path: '{{ BIN_DIR }}/cni'
+    state: directory
+
+- name: Extract cni archive
+  unarchive:
+    src: '{{ BIN_DIR }}/cni-plugins-linux-amd64-{{ cni_version }}.tgz'
+    dest: "{{ BIN_DIR }}/cni"
+    mode: 0554
+
+- name: Download containerd
+  get_url:
+    url: 'https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz'
+    dest: '{{ BIN_DIR }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz'
+    mode: 0644
+
+- name: Create containerd directory
+  file:
+    path: '{{ BIN_DIR }}/containerd'
+    state: directory
+
+- name: Extract containerd archive
+  unarchive:
+    src: '{{ BIN_DIR }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz'
+    dest: "{{ BIN_DIR }}/containerd"
+    mode: 0554
+
