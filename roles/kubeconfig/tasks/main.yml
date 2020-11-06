@@ -10,12 +10,13 @@
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
-      --server=https://{{ hostvars['loadbalancer1']['ansible_host'] }}:6443 \
+      --server=https://{{ hostvars['loadbalancer']['ansible_host'] }}:6443 \
       --kubeconfig={{ CONF_DIR }}/admin_lb.kubeconfig
 
     kubectl config set-credentials admin \
       --client-certificate={{ PKI_DIR }}/admin.pem \
       --client-key={{ PKI_DIR }}/admin-key.pem \
+      --embed-certs=true \
       --kubeconfig={{ CONF_DIR }}/admin_lb.kubeconfig
 
     kubectl config set-context k8s-the-hard-way \
@@ -33,7 +34,7 @@
     kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
-      --server=https://{{ hostvars['loadbalancer1']['ansible_host'] }}:6443 \
+      --server=https://{{ hostvars['loadbalancer']['ansible_host'] }}:6443 \
       --kubeconfig={{ CONF_DIR }}/{{ item }}.kubeconfig
    
     kubectl config set-credentials system:node:{{ item }} \
@@ -62,7 +63,7 @@
     kubectl config set-cluster k8s-the-hard-way \
        --certificate-authority={{ PKI_DIR }}/ca.pem \
        --embed-certs=true \
-       --server=https://{{ hostvars['loadbalancer1']['ansible_host'] }}:6443 \
+       --server=https://{{ hostvars['loadbalancer']['ansible_host'] }}:6443 \
        --kubeconfig={{ CONF_DIR }}/kube-proxy.kubeconfig
 
     kubectl config set-credentials kube-proxy \
@@ -84,7 +85,7 @@
   shell: |
     export PATH={{ BIN_DIR }}:$PATH
 
-    kubectl config set-cluster kubernetes-the-hard-way \
+    kubectl config set-cluster k8s-the-hard-way \
       --certificate-authority={{ PKI_DIR }}/ca.pem \
       --embed-certs=true \
       --server=https://127.0.0.1:6443 \
@@ -101,7 +102,7 @@
       --user=system:kube-controller-manager \
       --kubeconfig={{ CONF_DIR }}/kube-controller-manager.kubeconfig
 
-      #kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+    kubectl config use-context default --kubeconfig={{ CONF_DIR }}/kube-controller-manager.kubeconfig
   args:
     creates: '{{ CONF_DIR }}/kube-controller-manager.kubeconfig'
 

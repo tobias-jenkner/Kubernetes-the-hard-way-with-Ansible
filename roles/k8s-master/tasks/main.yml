@@ -18,13 +18,26 @@
     - '{{ BIN_DIR }}/kube-scheduler'
     - '{{ BIN_DIR }}/kubectl'
 
-- name: Create config directory
+- name: Create config directories
   file:
-    path: /var/lib/kubernetes
+    path: "{{ item }}"
     state: directory
     owner: root
     group: k8s
     mode: 0755
+  loop:
+    - /var/lib/kubernetes
+    - /etc/kubernetes/config
+
+- name: Copy kubeconfigs to master nodes
+  copy:
+    src: "{{ CONF_DIR }}/{{item}}"
+    dest: "/var/lib/kubernetes/"
+    owner: root
+    group: k8s
+    mode: 0640
+  with_items:
+    ['kube-controller-manager.kubeconfig', 'kube-scheduler.kubeconfig']
 
 - name: Copy certificates and keys
   copy:
@@ -41,6 +54,14 @@
     - '{{ PKI_DIR }}/encryption-config.yml'
     - '{{ PKI_DIR }}/service-account.pem'
     - '{{ PKI_DIR }}/service-account-key.pem'
+
+- name: kube-scheduler.yaml
+  copy:
+    src: etc/kubernetes/config/kube-scheduler.yaml
+    dest: /etc/kubernetes/config
+    owner: root
+    group: k8s
+    mode: 0640
 
 - name: Copy systemd unit file
   template:
@@ -60,19 +81,3 @@
 
 - meta: flush_handlers
 
-  #- name: Copy rbac config file
-  #  template:
-  #    src: rbac-conf/rbac.yml
-  #    dest: "~/"
-
-    #- name: Configure RBAC for kubelet authorization
-    #  run_once: yes
-    #  #local_action: "shell kubectl apply -f roles/k8s-master/templates/rbac-conf/rbac.yml --kubeconfig {{ CONF_DIR }}/admin.kubeconfig"
-    #  shell: |
-    #    kubectl apply -f ~/rbac.yml --kubeconfig ~/admin.kubeconfig
-    #  #become_user: "{{ lookup('env','USER') }}"
-    #  register: rbac_conf
-    #  until: rbac_conf.stderr == ''
-    #  retries: 3
-    #  delay: 10
- 
